@@ -1,0 +1,1 @@
+SECRET_KEY = "abcdefgh0123456789"
