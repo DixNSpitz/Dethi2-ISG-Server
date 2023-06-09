@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request, flash, url_for, current_app, Markup
+from flask import redirect, render_template, request, flash, url_for, jsonify
 from flask_login import current_user, login_required
 
 from isg_api.main import bp
@@ -24,4 +24,156 @@ def settings():
         return redirect(url_for('main.settings'))
     elif request.method == 'GET':
         form.username.data = current_user.username
-    return render_template('settings.html', form=form) # TODO send just the form?, is it even needed with Webapp?
+    return render_template('settings.html', form=form)  # TODO send just the form?, is it even needed with Webapp?
+
+
+@bp.route('/vitals')
+# login not required
+def vitals():
+    mocked_vitals = [
+        {"id": "1",
+         "name": "Tomate",
+         "days": [
+             {
+                 "id": "1",
+                 "name": "Montag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "2",
+                 "name": "Dienstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "3",
+                 "name": "Mittwoch",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "4",
+                 "name": "Donnerstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "5",
+                 "name": "Freitag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "6",
+                 "name": "Samstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "7",
+                 "name": "Sonntag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             },
+         ]
+         },
+        {"id": "2",
+         "name": "Chili",
+         "days": [
+             {
+                 "id": "1",
+                 "name": "Montag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "2",
+                 "name": "Dienstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "3",
+                 "name": "Mittwoch",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "4",
+                 "name": "Donnerstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "5",
+                 "name": "Freitag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "6",
+                 "name": "Samstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "7",
+                 "name": "Sonntag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             },
+         ]
+         },
+        {"id": "3",
+         "name": "Aloe Vera",
+         "days": [
+             {
+                 "id": "1",
+                 "name": "Montag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "2",
+                 "name": "Dienstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "3",
+                 "name": "Mittwoch",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "4",
+                 "name": "Donnerstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "5",
+                 "name": "Freitag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "6",
+                 "name": "Samstag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             }, {
+                 "id": "7",
+                 "name": "Sonntag",
+                 "water_value": 0.5,
+                 "light_value": 2000.5,
+                 "temperature_value": 23,
+             },
+         ]
+         },
+    ]
+    return jsonify(mocked_vitals)
