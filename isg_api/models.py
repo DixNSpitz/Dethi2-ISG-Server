@@ -41,7 +41,7 @@ class SensorType(db.Model):
     type = db.Column(db.String(32), index=True, unique=True)
     unit = db.Column(db.String(32))
 
-    data = db.relationship('sensor_data', primaryjoin=id == SensorData.sensor_type_id, backref='sensor_type', lazy='dynamic')
+    data = db.relationship('SensorData', primaryjoin=id == SensorData.sensor_type_id, backref='sensor_type', lazy='dynamic')
 
 
 class SmartLeaf(db.Model):
@@ -51,7 +51,7 @@ class SmartLeaf(db.Model):
     mac_address = db.Column(db.String(64), index=True, unique=True)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
 
-    data = db.relationship('sensor_data', primaryjoin=id == SensorData.smart_leaf_id, backref='smart_leaf', lazy='dynamic')
+    data = db.relationship('SensorData', primaryjoin=id == SensorData.smart_leaf_id, backref='smart_leaf', lazy='dynamic')
 
 
 class Plant(db.Model):
@@ -69,7 +69,7 @@ class Plant(db.Model):
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     edited_on = db.Column(db.DateTime, default=datetime.utcnow)
 
-    smart_leafs = db.relationship('smart_leaf', primaryjoin=id == SmartLeaf.plant_id, backref='plant', lazy='dynamic')
+    smart_leafs = db.relationship('SmartLeaf', primaryjoin=id == SmartLeaf.plant_id, backref='plant', lazy='dynamic')
 
 
 @event.listens_for(Plant, 'before_update')

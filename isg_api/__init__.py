@@ -8,6 +8,7 @@ from flask import Flask
 from flask_login import current_user
 
 from isg_api.globals import db, login, migrate, bootstrap
+from isg_api.models import SensorData, SensorType, SmartLeaf, Plant
 
 
 def create_app(test_config=None):
@@ -63,7 +64,7 @@ def create_app(test_config=None):
 
     @app.shell_context_processor
     def make_shell_context():
-        return {'db': db, 'User': User}
+        return {'db': db, 'User': User, 'SensorData': SensorData, 'SensorType': SensorType, 'SmartLeaf': SmartLeaf, 'Plant': Plant}
 
     # Mail-Logging-Handler
     if not app.debug and not app.testing:
