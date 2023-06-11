@@ -37,7 +37,7 @@
 		<type label="SET" length="1" sql="SET" quote=""/>
 		<type label="Bit" length="0" sql="bit" quote=""/>
 	</group>
-</datatypes><table x="1315" y="234" name="PLANT">
+</datatypes><table x="1246" y="281" name="PLANT">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -79,7 +79,7 @@
 </key>
 <comment>Plant Description</comment>
 </table>
-<table x="1033.6666564941406" y="305" name="SMART_LEAF">
+<table x="999" y="285" name="SMART_LEAF">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -87,7 +87,7 @@
 <datatype>INTEGER</datatype>
 <relation table="PLANT" row="id" />
 </row>
-<row name="box_index" null="0" autoincrement="0">
+<row name="box_idx" null="0" autoincrement="0">
 <datatype>INTEGER</datatype>
 <comment>first, second or third device in the plant box. Needs to be configurable</comment>
 </row>
@@ -103,44 +103,24 @@
 </key>
 <comment>Our BLE - Client Devices</comment>
 </table>
-<table x="722.6666564941406" y="214" name="SENSOR_DATA_LIGHT">
+<table x="741" y="292" name="SENSOR_DATA">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
-<row name="unit" null="0" autoincrement="0">
-<datatype>VARCHAR</datatype>
-<default>'NULL'</default></row>
 <row name="smart_leaf_id" null="1" autoincrement="0">
 <datatype>INT</datatype>
 <default>NULL</default><relation table="SMART_LEAF" row="id" />
 </row>
-<row name="measured_on" null="0" autoincrement="0">
-<datatype>DATETIME</datatype>
-<default>'Now'</default></row>
+<row name="sensor_type_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="SENSOR_TYPE" row="id" />
+</row>
 <row name="value" null="0" autoincrement="0">
 <datatype>DECIMAL</datatype>
-</row>
-<key type="PRIMARY" name="">
-<part>id</part>
-</key>
-</table>
-<table x="719.6666564941406" y="412" name="SENSOR_DATA_WATER">
-<row name="id" null="1" autoincrement="1">
-<datatype>INTEGER</datatype>
-<default>NULL</default></row>
-<row name="unit" null="1" autoincrement="0">
-<datatype>VARCHAR</datatype>
-<default>NULL</default></row>
-<row name="smart_leaf_id" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default><relation table="SMART_LEAF" row="id" />
 </row>
 <row name="measured_on" null="0" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>'Now'</default></row>
-<row name="value" null="0" autoincrement="0">
-<datatype>DECIMAL</datatype>
-</row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
@@ -168,5 +148,19 @@
 <part>id</part>
 </key>
 <comment>Admin User Table</comment>
+</table>
+<table x="492.8000030517578" y="310" name="SENSOR_TYPE">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="type" null="0" autoincrement="0">
+<datatype>VARCHAR(32)</datatype>
+</row>
+<row name="unit" null="0" autoincrement="0">
+<datatype>VARCHAR(64)</datatype>
+</row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
 </table>
 </sql>
