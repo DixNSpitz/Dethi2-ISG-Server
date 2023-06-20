@@ -1,0 +1,10 @@
+python-dotenv
+bootstrap-flask
+flask~=2.3.2
+flask-wtf
+flask-login
+flask-migrate
+flask-sqlalchemy
+flask-cors
+Werkzeug~=2.3.4
+click~=8.1.3
