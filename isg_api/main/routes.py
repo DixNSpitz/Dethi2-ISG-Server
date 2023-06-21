@@ -115,10 +115,12 @@ def game():
     except Exception as e:
         return jsonify({'error': f"An error occurred: {str(e)}"}), 500
 
+last_value = None
+
 @bp.route('/light')
 # login not required
-
 async def light():   #bluetooth verbinden  
+    global last_value
     async with BleakClient(address) as client:
         for service in client.services:
             if service.handle == 19:   
@@ -127,11 +129,13 @@ async def light():   #bluetooth verbinden
                         await client.start_notify(charact.uuid, notification_handler)
                         await asyncio.sleep(10) # 3 hours for tech-probe
                         await client.stop_notify(charact.uuid)
-    return '', 200
+    return str(last_value), 200
 
 def notification_handler(sender, data):
+    global last_value
     #winsound.PlaySound("server/sounds/jump.wav", winsound.SND_FILENAME)
-    print('light_value:', struct.unpack('<i', data)[0])
+    last_value = struct.unpack('<i', data)[0]
+    print('light_value:', last_value)
     print('notification handler is doing something')
     
 
