@@ -9,6 +9,12 @@ from isg_api.models import SensorData, SmartLeaf
 import datetime
 import statistics
 
+import asyncio, struct
+from bleak import BleakClient
+
+
+address = "E8:9F:6D:22:7C:BE"
+
 @bp.route('/')
 @bp.route('/index')
 def home():
@@ -214,3 +220,22 @@ def vitals():
     #      },
     # ]
     # return jsonify(mocked_vitals)
+@bp.route('/light')
+# login not required
+
+async def light():   #bluetooth verbinden  
+    async with BleakClient(address) as client:
+        for service in client.services:
+            if service.handle == 19:   
+                for charact in service.characteristics:
+                    if charact.handle == 20:
+                        await client.start_notify(charact.uuid, notification_handler)
+                        await asyncio.sleep(10) # 3 hours for tech-probe
+                        await client.stop_notify(charact.uuid)
+    return '', 200
+
+def notification_handler(sender, data):
+    #winsound.PlaySound("server/sounds/jump.wav", winsound.SND_FILENAME)
+    print('light_value:', struct.unpack('<i', data)[0])
+    print('notification handler is doing something')
+    
