@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request, flash, url_for, jsonify
+from flask import redirect, render_template, request, flash, url_for, jsonify, abort
 from flask_login import current_user, login_required
 
 from isg_api.main import bp
@@ -9,6 +9,7 @@ from isg_api.models import SensorData, SmartLeaf
 import datetime
 import statistics
 
+from .game_state import GameState
 import asyncio, struct
 from bleak import BleakClient
 
@@ -47,7 +48,7 @@ def vitals():
         day_arr = []
 
         base_dt = datetime.date.today()
-        date_list = [base_dt - datetime.timedelta(days=x) for x in range(7)] # last 7 days
+        date_list = [base_dt - datetime.timedelta(days=x) for x in range(7)]  # last 7 days
 
         i = 1
         for d in date_list:
@@ -60,10 +61,13 @@ def vitals():
                 SensorData.measured_on < (d + datetime.timedelta(days=1)).strftime('%Y-%m-%d')).all()
 
             mean_humidity = None if not d_data_humidity else statistics.mean((d_d.value for d_d in d_data_humidity))
-            mean_luminosity = None if not d_data_luminosity else statistics.mean((d_d.value for d_d in d_data_luminosity))
-            mean_temperature = None if not d_data_temperature else statistics.mean((d_d.value for d_d in d_data_temperature))
+            mean_luminosity = None if not d_data_luminosity else statistics.mean(
+                (d_d.value for d_d in d_data_luminosity))
+            mean_temperature = None if not d_data_temperature else statistics.mean(
+                (d_d.value for d_d in d_data_temperature))
 
-            day_dict = {"id": i, "name": d.strftime("%A"), "water_value": mean_humidity, "light_value": mean_luminosity, "temperature_value": mean_temperature}
+            day_dict = {"id": i, "name": d.strftime("%A"), "water_value": mean_humidity, "light_value": mean_luminosity,
+                        "temperature_value": mean_temperature}
 
             day_arr.append(day_dict)
             i += 1
@@ -73,153 +77,44 @@ def vitals():
 
     return jsonify(vital_arr)
 
-    # mocked_vitals = [
-    #     {"id": "1",
-    #      "name": "Tomate",
-    #      "days": [
-    #          {
-    #              "id": "1",
-    #              "name": "Montag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "2",
-    #              "name": "Dienstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "3",
-    #              "name": "Mittwoch",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "4",
-    #              "name": "Donnerstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "5",
-    #              "name": "Freitag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "6",
-    #              "name": "Samstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "7",
-    #              "name": "Sonntag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          },
-    #      ]
-    #      },
-    #     {"id": "2",
-    #      "name": "Chili",
-    #      "days": [
-    #          {
-    #              "id": "1",
-    #              "name": "Montag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "2",
-    #              "name": "Dienstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "3",
-    #              "name": "Mittwoch",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "4",
-    #              "name": "Donnerstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "5",
-    #              "name": "Freitag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "6",
-    #              "name": "Samstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "7",
-    #              "name": "Sonntag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          },
-    #      ]
-    #      },
-    #     {"id": "3",
-    #      "name": "Aloe Vera",
-    #      "days": [
-    #          {
-    #              "id": "1",
-    #              "name": "Montag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "2",
-    #              "name": "Dienstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "3",
-    #              "name": "Mittwoch",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "4",
-    #              "name": "Donnerstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "5",
-    #              "name": "Freitag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "6",
-    #              "name": "Samstag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          }, {
-    #              "id": "7",
-    #              "name": "Sonntag",
-    #              "water_value": 0.5,
-    #              "light_value": 2000.5,
-    #              "temperature_value": 23,
-    #          },
-    #      ]
-    #      },
-    # ]
-    # return jsonify(mocked_vitals)
+
+game_state = GameState()
+valid_games = ["humidity", "multiple", "order"]
+
+
+@bp.route('/games', methods=['GET', 'POST'])
+def game():
+    try:
+        request_data = request.get_json(silent=True)
+        print(f"Method: {request.method}, JSON: {request_data}")  # Debugging line
+
+        if request.method == 'POST':
+            if request_data is None or 'game' not in request_data:
+                abort(400, description="Missing 'game' key in request. The key 'game' is required.")
+
+            game_to_start = request_data['game'].lower()
+            print(f"Game to start: {game_to_start}")  # Debugging line
+
+            if game_to_start == 'off':
+                print("Attempting to stop game")  # Debugging line
+                game_state.stop_game()
+                print("Game stopped")  # Debugging line
+            elif game_to_start not in valid_games:
+                abort(400, description=f"Invalid game '{game_to_start}'. Available games are: {', '.join(valid_games)} or off")
+            else:
+                game_state.start_game(game_to_start)
+
+            return jsonify({'message': 'Game updated'}), 200
+
+        elif request.method == 'GET':
+            return jsonify(game_state.get_state()), 200
+
+        else:
+            return jsonify({'message': 'Invalid HTTP method'}), 405
+
+    except Exception as e:
+        return jsonify({'error': f"An error occurred: {str(e)}"}), 500
+
 @bp.route('/light')
 # login not required
 
@@ -239,3 +134,5 @@ def notification_handler(sender, data):
     print('light_value:', struct.unpack('<i', data)[0])
     print('notification handler is doing something')
     
+
+
