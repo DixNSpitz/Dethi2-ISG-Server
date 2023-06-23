@@ -12,9 +12,10 @@ import statistics
 from .game_state import GameState
 import asyncio, struct
 from bleak import BleakClient
+import winsound
 
 
-address = "E8:9F:6D:22:7C:BE"
+address = "E8:9F:6D:22:7C:BE"   
 
 @bp.route('/')
 @bp.route('/index')
@@ -119,6 +120,7 @@ last_value = None
 
 @bp.route('/light')
 # login not required
+
 async def light():   #bluetooth verbinden  
     global last_value
     async with BleakClient(address) as client:
@@ -133,10 +135,15 @@ async def light():   #bluetooth verbinden
 
 def notification_handler(sender, data):
     global last_value
-    #winsound.PlaySound("server/sounds/jump.wav", winsound.SND_FILENAME)
+    winsound.PlaySound(f"sounds/TouchGroundGameStart.wav", winsound.SND_FILENAME)   
     last_value = struct.unpack('<i', data)[0]
-    print('light_value:', last_value)
+    #winsound.PlaySound("server/sounds/jump.wav", winsound.SND_FILENAME)
+    print('light_value:', struct.unpack('<i', data)[0])
     print('notification handler is doing something')
-    
+
+    # next step: communicate between server and client, send data from client to server 
+    # implement the game guessing the waterlevel
+
+
 
 
