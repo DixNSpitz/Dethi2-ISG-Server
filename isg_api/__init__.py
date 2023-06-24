@@ -10,6 +10,8 @@ from flask_login import current_user
 from isg_api.globals import db, login, migrate, bootstrap
 from isg_api.models import SensorData, SensorType, SmartLeaf, Plant
 
+from isg_api.main.scheduled import start_schedule
+
 
 def create_app(test_config=None):
     # create and configure the app
@@ -81,4 +83,5 @@ def create_app(test_config=None):
         app.logger.setLevel(logging.INFO)
         app.logger.info('ISG-API startup')
 
+    start_schedule()
     return app

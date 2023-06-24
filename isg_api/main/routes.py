@@ -1,15 +1,16 @@
 from flask import redirect, render_template, request, flash, url_for, jsonify, abort
 from flask_login import current_user, login_required
 
-from isg_api.main import bp
 from isg_api.globals import db
+
+from isg_api.main import bp
+from isg_api.main.game_state import GameState
 from isg_api.main.forms import SettingsForm
 from isg_api.models import SensorData, SmartLeaf
 
 import datetime
 import statistics
 
-from .game_state import GameState
 import asyncio, struct
 from bleak import BleakClient
 import winsound
