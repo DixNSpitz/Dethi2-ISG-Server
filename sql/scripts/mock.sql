@@ -1,8 +1,8 @@
 
 -- smart leaf
-insert into smart_leaf (id, plant_id, box_idx, mac_address, created_on) VALUES (1, 1, 1 , 'E8:9F:6D:24:09:9A', CURRENT_DATE); -- Tomato
-insert into smart_leaf (id, plant_id, box_idx, mac_address, created_on) VALUES (2, 2, 2 , 'E8:9F:6D:24:09:9B', CURRENT_DATE); -- Chili
-insert into smart_leaf (id, plant_id, box_idx, mac_address, created_on) VALUES (3, 3, 3 , 'E8:9F:6D:24:09:9C', CURRENT_DATE); -- Aloe Vera
+insert into smart_leaf (id, plant_id, box_idx, mac_address, created_on) VALUES (1, 1, 1 , 'E8:9F:6D:1F:BB:2A', CURRENT_DATE); -- Tomato
+insert into smart_leaf (id, plant_id, box_idx, mac_address, created_on) VALUES (2, 2, 2 , 'E8:9F:6D:22:7C:BE', CURRENT_DATE); -- Chili
+insert into smart_leaf (id, plant_id, box_idx, mac_address, created_on) VALUES (3, 3, 3 , 'E8:9F:6D:28:3F:4A', CURRENT_DATE); -- Aloe Vera
 
 -- sensor data mock, mockaroo.com
 insert into sensor_data (id, smart_leaf_id, sensor_type_id, value, measured_on) values (1, 3, 1, 8545.84, '2023-06-02 19:47:57');
