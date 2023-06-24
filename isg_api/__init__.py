@@ -1,5 +1,6 @@
 import os
 import logging
+import isg_api.main.scheduled
 
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
@@ -7,10 +8,8 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask
 from flask_login import current_user
 
-from isg_api.globals import db, login, migrate, bootstrap
+from isg_api.globals import db, login, migrate, bootstrap, scheduler
 from isg_api.models import SensorData, SensorType, SmartLeaf, Plant
-
-from isg_api.main.scheduled import start_schedule
 
 
 def create_app(test_config=None):
@@ -50,6 +49,9 @@ def create_app(test_config=None):
     # Login-Manager
     login.init_app(app)
 
+    # Task-Scheduler
+    scheduler.init_app(app)
+
     # Blueprints
     from isg_api import main, errors, auth
     app.register_blueprint(auth.bp, url_prefix='/auth')
@@ -83,5 +85,5 @@ def create_app(test_config=None):
         app.logger.setLevel(logging.INFO)
         app.logger.info('ISG-API startup')
 
-    start_schedule()
+    scheduler.start()
     return app
