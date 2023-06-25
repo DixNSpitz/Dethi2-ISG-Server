@@ -20,7 +20,12 @@ def connect_to_leafs():
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(asyncio.gather(*(fetch_smart_leaf_report(c) for c in clients)))
+    tasks = asyncio.gather(*(asyncio.wait_for(test_conn(c), timeout=100) for c in clients))
+    try:
+        loop.run_until_complete(tasks)
+    except Exception as e:
+        print('Exited tasks execution because of timeout')
+        print(e)
 
 
 async def fetch_smart_leaf_report(client: BleSmartLeaf):
