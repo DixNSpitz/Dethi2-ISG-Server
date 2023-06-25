@@ -16,7 +16,7 @@ class BleSmartLeaf:
     def _reset_client(self):
         self.client = BleakClient(self.address)
 
-    async def connect(self, retries=3):
+    async def connect(self, retries=2):
         if self.client.is_connected: return True
 
         retry_ct = 0
@@ -30,6 +30,10 @@ class BleSmartLeaf:
                 retry_ct += 1
 
         if self.client.is_connected:
+            if retry_ct == retries:
+                await self.disconnect()
+                return False
+
             # Hook all notifiers
             try:
                 for notify_uuid in notify_uuid_dict.values():
@@ -39,12 +43,14 @@ class BleSmartLeaf:
                 self._log('Exception was thrown while trying to hook notifiers')
                 if self._print_exception_details: print(e)
                 await self.disconnect()
+                self._reset_client()
                 return False
 
             self._log('Connected')
             return True
         else:
             self._log('Could not connect')
+            self._reset_client()
             return False
 
     async def disconnect(self):
