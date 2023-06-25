@@ -3,6 +3,7 @@
 insert into sensor_type (id, type, unit) VALUES (1, 'Luminosity', 'lux');
 insert into sensor_type (id, type, unit) VALUES (2, 'Humidity', '');
 insert into sensor_type (id, type, unit) VALUES (3, 'Temperature', '°C');
+insert into sensor_type (id, type, unit) VALUES (4, 'Percentage', '%');
 
 -- admin
 -- delete from user; -- uncomment if needed
