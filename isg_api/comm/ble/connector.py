@@ -1,7 +1,10 @@
 import asyncio
+import struct
 
 from bleak import BleakClient
 from isg_api.comm.ble.notifier import ble_callback, notify_uuid_dict
+
+notify_uuid_report ='0000{0:x}-0000-1000-8000-00805f9b34fb'.format(0x2A4D)
 
 
 async def connect_to_device(address, print_service_details=False):
@@ -22,6 +25,9 @@ async def connect_to_device(address, print_service_details=False):
                     await client.start_notify(notify_uuid, lambda x, y: ble_callback(address, x, y, True))
 
                 # wait 10 seconds for response
+                print('write to report char')
+                await client.write_gatt_char(notify_uuid_report, struct.pack('<i', 12345)) # TODO create command table => 0 send back sensor data, 125500000011000000 => e.g. display two red LEDs
+                print('write finished')
                 await asyncio.sleep(40.0)
 
                 for notify_uuid in notify_uuid_dict.values():
