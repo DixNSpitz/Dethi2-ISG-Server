@@ -139,8 +139,6 @@ last_value = None
 
 
 @bp.route('/light')
-# login not required
-
 async def light():  # bluetooth verbinden
     global last_value
     async with BleakClient(address) as client:

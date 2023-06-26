@@ -9,7 +9,10 @@ from flask import Flask
 from flask_login import current_user
 
 from isg_api.globals import db, login, migrate, bootstrap, scheduler
+from isg_api.smart_leaf_devices import ble_smart_leafs
 from isg_api.models import SensorData, SensorType, SmartLeaf, Plant
+from isg_api.comm.ble.smart_leaf import BleSmartLeaf
+# from isg_api.comm.ble.callbacks_idle import callback_touch, callback_hum, callback_lum
 
 
 def create_app(test_config=None):
@@ -65,6 +68,26 @@ def create_app(test_config=None):
         if current_user.is_authenticated:
             current_user.last_seen = datetime.utcnow()
             db.session.commit()
+
+    # notifier.set_touch_callback(callback_touch)
+    # notifier.set_lum_callback(callback_lum)
+    #
+    # # Create global BLE devices
+    # macs = db.session.query(SmartLeaf.mac_address).all()
+    # macs = [mac for mac, in macs]  # I honestly don't know why this is needed
+    #
+    # # Then try to connect to every BLE-device
+    # ble_smart_leafs = [BleSmartLeaf(mac) for mac in macs]
+    #
+    # async def connect_to_smart_leafs(c): await c.connect()
+    # tasks = asyncio.gather(*(asyncio.wait_for(connect_to_smart_leafs(c), timeout=100) for c in ble_smart_leafs))
+    # try:
+    #     loop = asyncio.get_event_loop()
+    #     loop.run_until_complete(tasks)
+    # except Exception as e:
+    #     print('Exited tasks execution because of timeout')
+    #     print(e)
+
 
     @app.shell_context_processor
     def make_shell_context():
