@@ -1,6 +1,7 @@
 from flask import redirect, render_template, request, flash, url_for, jsonify, abort
 from flask_login import current_user, login_required
-
+import locale
+import contextlib
 from isg_api.globals import db
 
 from isg_api.main import bp
@@ -15,8 +16,8 @@ import asyncio, struct
 from bleak import BleakClient
 import winsound
 
+address = "E8:9F:6D:22:7C:BE"
 
-address = "E8:9F:6D:22:7C:BE"   
 
 @bp.route('/')
 @bp.route('/index')
@@ -39,6 +40,16 @@ def settings():
     return render_template('settings.html', form=form)  # TODO send just the form?, is it even needed with Webapp?
 
 
+# Set the locale to German temporarily
+@contextlib.contextmanager
+def set_locale(name):
+    saved = locale.setlocale(locale.LC_ALL)
+    try:
+        yield locale.setlocale(locale.LC_ALL, name)
+    finally:
+        locale.setlocale(locale.LC_ALL, saved)
+
+
 @bp.route('/vitals')
 # login not required
 def vitals():
@@ -51,6 +62,8 @@ def vitals():
 
         base_dt = datetime.date.today()
         date_list = [base_dt - datetime.timedelta(days=x) for x in range(7)]  # last 7 days
+
+        date_list = date_list[::-1]  # Reverse the list to make the current day the last element
 
         i = 1
         for d in date_list:
@@ -68,7 +81,10 @@ def vitals():
             mean_temperature = None if not d_data_temperature else statistics.mean(
                 (d_d.value for d_d in d_data_temperature))
 
-            day_dict = {"id": i, "name": d.strftime("%A"), "water_value": mean_humidity, "light_value": mean_luminosity,
+            with set_locale('de_DE.utf8'):  # Set locale to German temporarily
+                day_name = d.strftime('%a')  # Get weekday name in German
+
+            day_dict = {"id": i, "name": day_name, "water_value": mean_humidity, "light_value": mean_luminosity,
                         "temperature_value": mean_temperature}
 
             day_arr.append(day_dict)
@@ -102,7 +118,8 @@ def game():
                 game_state.stop_game()
                 print("Game stopped")  # Debugging line
             elif game_to_start not in valid_games:
-                abort(400, description=f"Invalid game '{game_to_start}'. Available games are: {', '.join(valid_games)} or off")
+                abort(400,
+                      description=f"Invalid game '{game_to_start}'. Available games are: {', '.join(valid_games)} or off")
             else:
                 game_state.start_game(game_to_start)
 
@@ -117,34 +134,33 @@ def game():
     except Exception as e:
         return jsonify({'error': f"An error occurred: {str(e)}"}), 500
 
+
 last_value = None
+
 
 @bp.route('/light')
 # login not required
 
-async def light():   #bluetooth verbinden  
+async def light():  # bluetooth verbinden
     global last_value
     async with BleakClient(address) as client:
         for service in client.services:
-            if service.handle == 19:   
+            if service.handle == 19:
                 for charact in service.characteristics:
                     if charact.handle == 20:
                         await client.start_notify(charact.uuid, notification_handler)
-                        await asyncio.sleep(10) # 3 hours for tech-probe
+                        await asyncio.sleep(10)  # 3 hours for tech-probe
                         await client.stop_notify(charact.uuid)
     return str(last_value), 200
 
+
 def notification_handler(sender, data):
     global last_value
-    winsound.PlaySound(f"sounds/TouchGroundGameStart.wav", winsound.SND_FILENAME)   
+    winsound.PlaySound(f"sounds/TouchGroundGameStart.wav", winsound.SND_FILENAME)
     last_value = struct.unpack('<i', data)[0]
-    #winsound.PlaySound("server/sounds/jump.wav", winsound.SND_FILENAME)
+    # winsound.PlaySound("server/sounds/jump.wav", winsound.SND_FILENAME)
     print('light_value:', struct.unpack('<i', data)[0])
     print('notification handler is doing something')
 
     # next step: communicate between server and client, send data from client to server 
     # implement the game guessing the waterlevel
-
-
-
-
