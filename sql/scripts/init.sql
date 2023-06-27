@@ -20,10 +20,10 @@ VALUES (1, 'admin', null,
 -- delete from plant; -- uncomment if needed
 insert into plant (id, name, description_1, description_2, description_3, water_min, water_max, light_min, light_max,
                    harvest_begin, harvest_end, created_on, edited_on, temperature_min, temperature_max)
-VALUES (1, 'Tomate', 'Die Tomate ist cool', null, null, 20, 50, 0, 6000, null, null, CURRENT_DATE, CURRENT_DATE, 10, 32);
+VALUES (1, 'Tomate', 'Die Tomate ist cool', null, null, 200, 1000, 0, 6000, null, null, CURRENT_DATE, CURRENT_DATE, 10, 32);
 insert into plant (id, name, description_1, description_2, description_3, water_min, water_max, light_min, light_max,
                    harvest_begin, harvest_end, created_on, edited_on, temperature_min, temperature_max)
-VALUES (2, 'Chili', 'Chili ist chillig', null, null, 20, 50, 0, 5000, null, null, CURRENT_DATE, CURRENT_DATE, 15, 32);
+VALUES (2, 'Chili', 'Chili ist chillig', null, null, 200, 1000, 0, 5000, null, null, CURRENT_DATE, CURRENT_DATE, 15, 32);
 insert into plant (id, name, description_1, description_2, description_3, water_min, water_max, light_min, light_max,
                    harvest_begin, harvest_end, created_on, edited_on, temperature_min, temperature_max)
-VALUES (3, 'Aloe Vera', 'Miau!', null, null, 20, 50, 0, 4000, null, null, CURRENT_DATE, CURRENT_DATE, 7, 32);
+VALUES (3, 'Aloe Vera', 'Miau!', null, null, 200, 1000, 0, 4000, null, null, CURRENT_DATE, CURRENT_DATE, 7, 32);
