@@ -33,7 +33,7 @@ class BleSmartLeaf:
     _notify_uuid_report = '0000{0:x}-0000-1000-8000-00805f9b34fb'.format(0x2A4D)
     _notify_uuid_set_neo = '0000{0:x}-0000-1000-8000-00805f9b34fb'.format(0x2BE2)
 
-    def __init__(self, address, print_exception_details=False):
+    def __init__(self, address, print_exception_details=True):
         self.loop = asyncio.get_event_loop()
         self.address = address
         self._reset_client()
