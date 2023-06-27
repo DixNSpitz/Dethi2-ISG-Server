@@ -1,0 +1,11 @@
+[Unit]
+Description=Interactive School Garden - API
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/pi/server/Dethi2-ISG-Server
+ExecStart=/home/pi/server/Dethi2-ISG-Server/venv/bin/python -m flask run
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
