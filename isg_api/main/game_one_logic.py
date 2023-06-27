@@ -1,7 +1,7 @@
-import random
 from playsound import playsound
 from flask import current_app
 from os import path
+from isg_api.models import SmartLeaf
 
 # key: Frage-Idx, Value: Tuple (Frage-Sound-File, correct plant-id for answer)
 _sound_files = {
@@ -47,6 +47,15 @@ _index_to_plant = {
 }
 
 
+def callback_touch(client, value):
+    with current_app.app_context():
+        sl = SmartLeaf.query.filter(SmartLeaf.mac_address == client.address).first()
+        if sl and sl.plant:
+            return sl.plant.id
+
+    return -1
+
+
 # Tomate: 1 # Chili: 2 # Aloe Vera: 3
 # Pick random sound file
 def choose_question(q_idx):
@@ -56,11 +65,13 @@ def choose_question(q_idx):
             playsound(p)
         except Exception as e:
             print('Error while trying to play sound-file:', p, 'Msg:', e)
+            return -1
 
         # Return correct plant-idx
         return _sound_files[q_idx][1]
     else:
         print(f"Invalid sound value: {q_idx}")
+        return -1
 
 
 def user_chose_plant(user_chosen_plant_id, correct_plant_id):
@@ -77,6 +88,7 @@ def user_chose_plant(user_chosen_plant_id, correct_plant_id):
         p = path.join(current_app.root_path, 'static', 'sounds', sound_file)
         try:
             playsound(p)
+
         except Exception as e:
             print('Error while trying to play sound-file:', p, 'Msg:', e)
         print(f'Sound played: {sound_file}')
