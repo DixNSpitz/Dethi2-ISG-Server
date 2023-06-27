@@ -146,18 +146,18 @@ last_value = None
 
 
 @bp.route('/light')
-# login not required
-
 async def light():  # bluetooth verbinden
-    global last_value
-    async with BleakClient(address) as client:
-        for service in client.services:
-            if service.handle == 19:
-                for charact in service.characteristics:
-                    if charact.handle == 20:
-                        await client.start_notify(charact.uuid, notification_handler)
-                        await asyncio.sleep(10)  # 3 hours for tech-probe
-                        await client.stop_notify(charact.uuid)
+    # global last_value
+    # async with BleakClient(address) as client:
+    #     for service in client.services:
+    #         if service.handle == 19:
+    #             for charact in service.characteristics:
+    #                 if charact.handle == 20:
+    #                     await client.start_notify(charact.uuid, notification_handler)
+    #                     await asyncio.sleep(10)  # 3 hours for tech-probe
+    #                     await client.stop_notify(charact.uuid)
+
+
     return str(last_value), 200
 
 

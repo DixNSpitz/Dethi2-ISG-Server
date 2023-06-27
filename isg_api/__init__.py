@@ -10,6 +10,7 @@ from flask_login import current_user
 
 from isg_api.globals import db, login, migrate, bootstrap, scheduler
 from isg_api.models import SensorData, SensorType, SmartLeaf, Plant
+from isg_api.comm.ble.smart_leaf import BleSmartLeaf
 
 
 def create_app(test_config=None):
