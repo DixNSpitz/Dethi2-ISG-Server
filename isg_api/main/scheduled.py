@@ -27,7 +27,7 @@ def ble_heartbeat():
         for mac in macs:
             smd.ble_smart_leafs.append(BleSmartLeaf(mac))
 
-    smd.loop.call_soon_threadsafe(lambda: asyncio.gather(*(asyncio.wait_for(simple_connect(c), timeout=50) for c in smd.ble_smart_leafs)))
+    smd.loop.call_soon_threadsafe(lambda: asyncio.gather(*(asyncio.wait_for(simple_connect(c), timeout=150) for c in smd.ble_smart_leafs)))
     #for c in smd.ble_smart_leafs:
         #smd.loop.call_soon_threadsafe(lambda: smd.loop.create_task(asyncio.wait_for(simple_connect(c), timeout=50)))
 
@@ -54,7 +54,7 @@ async def simple_connect(client: BleSmartLeaf):
     client.connect()
 
 
-@scheduler.task('cron', id='fetch_smart_leaf_report', minute='*/2')
+@scheduler.task('cron', id='fetch_smart_leaf_report', minute='*/10')
 def fetch_smart_leaf_report_cron():
     print('Starting cron job "fetch_smart_leaf_report"')
     if smd.ble_smart_leafs is None or len(smd.ble_smart_leafs) == 0:

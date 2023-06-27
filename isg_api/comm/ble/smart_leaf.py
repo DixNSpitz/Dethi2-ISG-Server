@@ -63,9 +63,9 @@ class BleSmartLeaf:
         self._log('Reset client...')
         self.client = BleakClient(self.address)
 
-    def connect(self, retries=2):
+    def connect(self, retries=5):
         try:
-            return self.loop.create_task(asyncio.wait_for(self._connect(retries), timeout=50))
+            return self.loop.create_task(asyncio.wait_for(self._connect(retries), timeout=140))
         except Exception as e:
             self._log('Exception occurred while tryinc to connect', e)
 
