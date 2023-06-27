@@ -64,6 +64,8 @@ class Plant(db.Model):
     water_max = db.Column(db.Float)
     light_min = db.Column(db.Float)
     light_max = db.Column(db.Float)
+    temperature_min = db.Column(db.Float)
+    temperature_max = db.Column(db.Float)
     harvest_begin = db.Column(db.DateTime)
     harvest_end = db.Column(db.DateTime)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)

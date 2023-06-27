@@ -1,15 +1,17 @@
 from threading import Thread
 
+from isg_api.sensors.temperature.temperature import SenseTemperature
 from isg_api.globals import scheduler, db
 from isg_api.comm.ble.smart_leaf import BleSmartLeaf
-from isg_api.models import SmartLeaf
-import isg_api.globals_smart_leafs as smd
+from isg_api.models import SmartLeaf, SensorData
+from datetime import datetime
 
+import isg_api.globals_smart_leafs as smd
 import asyncio
 
 loop_running = False
-@scheduler.task('cron', id='ble_hearbeat', minute='*')
-def initialize_smart_leafs():
+@scheduler.task('cron', id='ble_heartbeat', minute='*')
+def ble_heartbeat():
     global loop_running
     asyncio.set_event_loop(smd.loop)
 
@@ -52,12 +54,34 @@ async def simple_connect(client: BleSmartLeaf):
     client.connect()
 
 
+def write_temperature_to_db():
+    with scheduler.app.app_context:
+        # Initialize the sensor
+        sense_temp = SenseTemperature(1, 0x44, 0x2C, [0x06])
+
+        c_temp, f_temp, humidity = sense_temp.read()
+        new_data = SensorData(
+            sensor_type_id=3,
+            value=c_temp,
+            smart_leaf_id=1,
+            measured_on=datetime.utcnow()
+        )
+
+        # Add the new entry to the session
+        db.session.add(new_data)
+
+        # Commit the session to write to the database
+        db.session.commit()
+
+
 # @scheduler.task('cron', id='fetch_smart_leaf_report', minute='*/10') TODO make this work
-def connect_to_leafs():
+def fetch_smart_leaf_report():
     print('Starting cron job "fetch_smart_leaf_report"')
     if smd.ble_smart_leafs is None or len(smd.ble_smart_leafs) == 0:
         return # no heartbeat yet
 
+    # call the function to write temperature to db here
+    write_temperature_to_db()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     tasks = asyncio.gather(*(asyncio.wait_for(fetch_smart_leaf_report(c), timeout=100) for c in smd.ble_smart_leafs))

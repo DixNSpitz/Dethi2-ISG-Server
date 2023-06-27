@@ -57,12 +57,20 @@ def vitals():
 
     leafs = SmartLeaf.query.all()
     for leaf in leafs:
-        vital_dict = {"id": leaf.id, "name": leaf.plant.name, "days": []}
-        day_arr = []
+        vital_dict = {
+            "id": leaf.id,
+            "name": leaf.plant.name,
+            "water_min": leaf.plant.water_min,
+            "water_max": leaf.plant.water_max,
+            "light_min": leaf.plant.light_min,
+            "light_max": leaf.plant.light_max,
+            "temperature_min": leaf.plant.temperature_min,
+            "temperature_max": leaf.plant.temperature_max,
+            "days": []
+        }
 
         base_dt = datetime.date.today()
         date_list = [base_dt - datetime.timedelta(days=x) for x in range(7)]  # last 7 days
-
         date_list = date_list[::-1]  # Reverse the list to make the current day the last element
 
         i = 1
@@ -87,10 +95,9 @@ def vitals():
             day_dict = {"id": i, "name": day_name, "water_value": mean_humidity, "light_value": mean_luminosity,
                         "temperature_value": mean_temperature}
 
-            day_arr.append(day_dict)
+            vital_dict["days"].append(day_dict)
             i += 1
 
-        vital_dict["days"] = day_arr
         vital_arr.append(vital_dict)
 
     return jsonify(vital_arr)
