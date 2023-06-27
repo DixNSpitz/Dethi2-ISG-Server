@@ -53,7 +53,7 @@ def ble_heartbeat():
             print(e)
 
 
-async def simple_connect(client: BleSmartLeaf):
+def simple_connect(client: BleSmartLeaf):
     client.connect()
 
 
