@@ -1,4 +1,5 @@
 from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
 
 from isg_api.sensors.temperature.temperature import SenseTemperature
 from isg_api.globals import scheduler, db
@@ -16,38 +17,40 @@ def ble_heartbeat():
     asyncio.set_event_loop(smd.loop)
 
     print('Starting cron job "ble-heartbeat"')
+
     if smd.ble_smart_leafs is None or len(smd.ble_smart_leafs) == 0:
         # First get all the BLE-device addresses from the DB
         print('need to create new objects...')
         with scheduler.app.app_context():
             macs = db.session.query(SmartLeaf.mac_address).all()
-            macs = [mac for mac, in macs]  # I honestly don't know why this is needed
+            macs = [mac for mac, in macs]  # Unpacking the tuple
 
         # Then try to connect to every BLE-device
         for mac in macs:
             smd.ble_smart_leafs.append(BleSmartLeaf(mac))
 
-    # smd.loop.call_soon_threadsafe(lambda: asyncio.gather(*(asyncio.wait_for(simple_connect(c), timeout=150) for c in smd.ble_smart_leafs)))
-    for c in smd.ble_smart_leafs:
-        smd.loop.call_soon_threadsafe(lambda: smd.loop.create_task(asyncio.wait_for(simple_connect(c), timeout=150)))
-
-    try:
-        # Run loop forever, but in another Thread, so the current one will be unblocked, which is needed
-        # because it is a cron-job!
+    if not loop_running:
         def run_forever(loop):
             loop.run_forever()
 
-        # because run_forever() will block the current thread, we spawn
-        # a subthread to issue that call in.
-        if not loop_running:
-            thread = Thread(target=run_forever, args=(smd.loop,))
-            thread.start()
+        thread = Thread(target=run_forever, args=(smd.loop,))
+        thread.start()
 
-            loop_running = True
+        loop_running = True
 
-    except Exception as e:
-        print('Exited tasks execution because of timeout')
-        print(e)
+    with ThreadPoolExecutor() as executor:
+        try:
+            loop = asyncio.get_event_loop()
+            tasks = [loop.run_in_executor(executor, asyncio.wait_for, simple_connect(c), 150) for c in smd.ble_smart_leafs]
+            completed, pending = loop.run_until_complete(asyncio.wait(tasks))
+            for task in completed:
+                try:
+                    result = task.result() # get the result of completed task
+                except Exception as e:
+                    print(f"A task completed with an error: {e}")
+        except Exception as e:
+            print('Exited tasks execution because of an error')
+            print(e)
 
 
 async def simple_connect(client: BleSmartLeaf):
