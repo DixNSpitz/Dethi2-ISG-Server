@@ -5,6 +5,32 @@ from isg_api.models import SensorData, SmartLeaf
 
 import asyncio
 
+
+from datetime import datetime
+
+from sensors.temperature.temperature import SenseTemperature
+
+def write_temperature_to_db():
+    # Initialize the sensor
+    sense_temp = SenseTemperature(1, 0x44, 0x2C, [0x06])
+
+    cTemp, fTemp, humidity = sense_temp.read()
+
+    new_data = SensorData(
+        sensor_type_id=3,  
+        value=cTemp,  
+        smart_leaf_id=1,  
+        measured_on=datetime.utcnow() 
+    )
+
+    # Add the new entry to the session
+    db.session.add(new_data)
+
+    # Commit the session to write to the database
+    db.session.commit()
+
+
+
 sensor_type = 0
 # run job every 10 minutes
 @scheduler.task('cron', id='fetch_smart_leaf_report', minute='*')
@@ -15,6 +41,9 @@ def connect_to_leafs():
     with scheduler.app.app_context():
         macs = db.session.query(SmartLeaf.mac_address).all()
         macs = [mac for mac, in macs] # I honestly don't know why this is needed
+
+    # call the function to write temperature to db here
+    write_temperature_to_db()
 
     # Then try to connect to every BLE-device
     clients = [BleSmartLeaf(mac) for mac in macs]
