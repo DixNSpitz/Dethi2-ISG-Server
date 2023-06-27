@@ -60,3 +60,21 @@ TOMATE
 Frage 12:
 Welche Pflanze wurde traditionell zur Behandlung von vielen gesundheitlichen Beschwerden wie Magenproblemen und Arthritis verwendet?"
 ALOE VERA
+
+
+Frage 13:
+Welche Pflanze stammt ursprünglich aus Südamerika und ihre roten Früchte sind ein Grundnahrungsmittel in der italienischen Küche?
+TOMATE
+
+Frage 14:
+Welche Pflanze wurde im 16. Jahrhundert von den Spaniern nach Europa gebracht und war anfangs eher als Zierpflanze beliebt, bevor sie als Nahrungsmittel entdeckt wurde?
+TOMATE
+
+Frage 15:
+Welche Pflanze ist ein Sukkulent, kann in trockenen Klimazonen überleben und hat fleischige Blätter, die Feuchtigkeit speichern können?
+ALOE VERA
+
+
+Frage 16:
+Berühre die richtige Pflanze. Welche Pflanze, obwohl sie oft als Gemüse betrachtet wird, ist botanisch gesehen eine Frucht und gehört zur Familie der Nachtschattengewächse?
+TOMATE
