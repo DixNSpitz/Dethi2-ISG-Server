@@ -27,9 +27,9 @@ def ble_heartbeat():
         for mac in macs:
             smd.ble_smart_leafs.append(BleSmartLeaf(mac))
 
-    smd.loop.call_soon_threadsafe(lambda: asyncio.gather(*(asyncio.wait_for(simple_connect(c), timeout=150) for c in smd.ble_smart_leafs)))
-    #for c in smd.ble_smart_leafs:
-        #smd.loop.call_soon_threadsafe(lambda: smd.loop.create_task(asyncio.wait_for(simple_connect(c), timeout=50)))
+    # smd.loop.call_soon_threadsafe(lambda: asyncio.gather(*(asyncio.wait_for(simple_connect(c), timeout=150) for c in smd.ble_smart_leafs)))
+    for c in smd.ble_smart_leafs:
+        smd.loop.call_soon_threadsafe(lambda: smd.loop.create_task(asyncio.wait_for(simple_connect(c), timeout=150)))
 
     try:
         # Run loop forever, but in another Thread, so the current one will be unblocked, which is needed
