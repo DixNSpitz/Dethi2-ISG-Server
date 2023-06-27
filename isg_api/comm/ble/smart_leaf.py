@@ -34,6 +34,7 @@ class BleSmartLeaf:
     _notify_uuid_set_neo = '0000{0:x}-0000-1000-8000-00805f9b34fb'.format(0x2BE2)
 
     def __init__(self, address, print_exception_details=False):
+        self.loop = asyncio.get_event_loop()
         self.address = address
         self._reset_client()
         self._print_exception_details = print_exception_details
@@ -41,12 +42,17 @@ class BleSmartLeaf:
         self._idle_mode = True
         self._idle_mode_touch_ct = 0
         self._idle_mode_lum = True
-        self.loop = asyncio.get_event_loop()
+        self._safe_sensor_values_to_db_mode = False
+        self.custom_callback_touch = None
+        self.use_custom_callbacks = False
 
     def set_idle_mode(self, on):
         self._idle_mode = on
         if not on:
             self._reset_idle_mode()
+
+    def set_safe_sensor_values_to_db_mode(self, on):
+        self._safe_sensor_values_to_db_mode = on
 
     def _reset_idle_mode(self):
         self._idle_time_started = None
@@ -200,6 +206,9 @@ class BleSmartLeaf:
                     # TODO important for games => notify game state!
                     value = struct.unpack('<i', data)[0] # 0 = short, 1 = long
                     self._log('Touch value received:', value)
+                    if self.use_custom_callbacks and self.custom_callback_touch is not None:
+                        self.custom_callback_touch(self, value)
+
                     touch = True
                     if self._idle_mode:
                         self._idle_time_started = time.time()
@@ -209,7 +218,7 @@ class BleSmartLeaf:
                             self._reset_idle_mode()
                             await self._send_set_neo_clear_all()
 
-                if not touch and datatype is not None and value is not None:
+                if self._safe_sensor_values_to_db_mode and not touch and datatype is not None and value is not None:
                     datapoint.sensor_type_id = datatype.id
                     datapoint.value = value
 

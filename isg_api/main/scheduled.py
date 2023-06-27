@@ -54,12 +54,18 @@ async def simple_connect(client: BleSmartLeaf):
     client.connect()
 
 
-def write_temperature_to_db():
-    with scheduler.app.app_context:
-        # Initialize the sensor
-        sense_temp = SenseTemperature(1, 0x44, 0x2C, [0x06])
+@scheduler.task('cron', id='fetch_smart_leaf_report', minute='*/2')
+def fetch_smart_leaf_report_cron():
+    print('Starting cron job "fetch_smart_leaf_report"')
+    if smd.ble_smart_leafs is None or len(smd.ble_smart_leafs) == 0:
+        return # no heartbeat yet
 
-        c_temp, f_temp, humidity = sense_temp.read()
+        # Initialize the sensor
+    sense_temp = SenseTemperature(1, 0x44, 0x2C, [0x06])
+    c_temp, f_temp, humidity = sense_temp.read()
+
+    # call the function to write temperature to db here
+    with scheduler.app.app_context():
         new_data = SensorData(
             sensor_type_id=3,
             value=c_temp,
@@ -67,39 +73,17 @@ def write_temperature_to_db():
             measured_on=datetime.utcnow()
         )
 
-        # Add the new entry to the session
         db.session.add(new_data)
-
-        # Commit the session to write to the database
         db.session.commit()
 
-
-# @scheduler.task('cron', id='fetch_smart_leaf_report', minute='*/10') TODO make this work
-def fetch_smart_leaf_report():
-    print('Starting cron job "fetch_smart_leaf_report"')
-    if smd.ble_smart_leafs is None or len(smd.ble_smart_leafs) == 0:
-        return # no heartbeat yet
-
-    # call the function to write temperature to db here
-    write_temperature_to_db()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    tasks = asyncio.gather(*(asyncio.wait_for(fetch_smart_leaf_report(c), timeout=100) for c in smd.ble_smart_leafs))
-    try:
-        loop.run_until_complete(tasks)
-    except Exception as e:
-        print('Exited tasks execution because of timeout')
-        print(e)
+    smd.loop.call_soon_threadsafe(
+        lambda: asyncio.gather(*(asyncio.wait_for(fetch_smart_leaf_report(c), timeout=50) for c in smd.ble_smart_leafs)))
 
 
 async def fetch_smart_leaf_report(client: BleSmartLeaf):
-    client.set_idle_mode(False)
-    client.connect()
-    await asyncio.sleep(1)
-
-    # Test Report Command - should send back sensor values to notifier.py callbacks
+    client.set_safe_sensor_values_to_db_mode(True)
     client.send_report_command()
-    client.set_idle_mode(True)
+    client.set_safe_sensor_values_to_db_mode(False)
 
 
 async def test_conn(client: BleSmartLeaf):

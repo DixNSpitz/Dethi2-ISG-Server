@@ -5,16 +5,12 @@ import contextlib
 from isg_api.globals import db
 
 from isg_api.main import bp
-from isg_api.main.game_state import GameState
+from isg_api.main.game_state import game_state, valid_games
 from isg_api.main.forms import SettingsForm
 from isg_api.models import SensorData, SmartLeaf
 
 import datetime
 import statistics
-
-import asyncio, struct
-from bleak import BleakClient
-import winsound
 
 address = "E8:9F:6D:22:7C:BE"
 
@@ -103,10 +99,6 @@ def vitals():
     return jsonify(vital_arr)
 
 
-game_state = GameState()
-valid_games = ["humidity", "multiple", "order"]
-
-
 @bp.route('/games', methods=['GET', 'POST'])
 def game():
     try:
@@ -146,28 +138,6 @@ last_value = None
 
 
 @bp.route('/light')
-async def light():  # bluetooth verbinden
-    # global last_value
-    # async with BleakClient(address) as client:
-    #     for service in client.services:
-    #         if service.handle == 19:
-    #             for charact in service.characteristics:
-    #                 if charact.handle == 20:
-    #                     await client.start_notify(charact.uuid, notification_handler)
-    #                     await asyncio.sleep(10)  # 3 hours for tech-probe
-    #                     await client.stop_notify(charact.uuid)
-
-
+async def light():
+    game_state.start_game('test')
     return str(last_value), 200
-
-
-def notification_handler(sender, data):
-    global last_value
-    winsound.PlaySound(f"sounds/TouchGroundGameStart.wav", winsound.SND_FILENAME)
-    last_value = struct.unpack('<i', data)[0]
-    # winsound.PlaySound("server/sounds/jump.wav", winsound.SND_FILENAME)
-    print('light_value:', struct.unpack('<i', data)[0])
-    print('notification handler is doing something')
-
-    # next step: communicate between server and client, send data from client to server 
-    # implement the game guessing the waterlevel
