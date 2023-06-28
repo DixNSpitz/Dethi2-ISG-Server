@@ -62,6 +62,7 @@ def choose_question(q_idx):
     if q_idx in _sound_files:
         p = path.join(current_app.root_path, 'static', 'sounds', _sound_files[q_idx][0])
         try:
+            print('Playing sound:', p)
             playsound(p)
         except Exception as e:
             print('Error while trying to play sound-file:', p, 'Msg:', e)
