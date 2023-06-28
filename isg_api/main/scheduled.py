@@ -85,6 +85,10 @@ async def simple_connect(macs):
     print('Starting BLE-Scanning...')
     for mac in macs:
         if mac in [sl.address for sl in smd.ble_smart_leafs]: continue
+        sl = next((sl for sl in smd.ble_smart_leafs if sl.address == mac), None)
+        if sl and not sl.client.is_connected:
+            smd.ble_smart_leafs.remove(sl)
+
         device = await BleakScanner.find_device_by_address(mac, return_adv=True, timeout=15)
         if device is not None and device.address not in [sl.address for sl in smd.ble_smart_leafs]:
             print('Found device:', mac)
