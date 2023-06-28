@@ -21,8 +21,10 @@ class _GameState:
         #    print('One or more Smart-Leafs are not conencted. Cannot start game!')
         #    return
 
-        #rand_question_idx = randrange(1, 17)
-        #correct_plant_id = choose_question(rand_question_idx)
+        rand_question_idx = randrange(1, 17)
+        correct_plant_would_be = choose_question(rand_question_idx)
+
+        print('correct plant would be:', correct_plant_would_be)
         #if correct_plant_id < 0:
         #    return
 

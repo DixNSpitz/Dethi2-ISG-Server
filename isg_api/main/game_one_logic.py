@@ -65,13 +65,13 @@ def choose_question(q_idx):
             playsound(p)
         except Exception as e:
             print('Error while trying to play sound-file:', p, 'Msg:', e)
-            return -1
+            return None
 
         # Return correct plant-idx
-        return _sound_files[q_idx][1]
+        return _index_to_plant[_sound_files[q_idx][1]]
     else:
         print(f"Invalid sound value: {q_idx}")
-        return -1
+        return None
 
 
 def user_chose_plant(user_chosen_plant_id, correct_plant_id):
