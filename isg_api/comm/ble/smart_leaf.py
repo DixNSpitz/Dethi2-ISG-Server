@@ -33,9 +33,10 @@ class BleSmartLeaf:
     _notify_uuid_report = '0000{0:x}-0000-1000-8000-00805f9b34fb'.format(0x2A4D)
     _notify_uuid_set_neo = '0000{0:x}-0000-1000-8000-00805f9b34fb'.format(0x2BE2)
 
-    def __init__(self, address, print_exception_details=True):
+    def __init__(self, address, ble_device, print_exception_details=True):
         self.loop = asyncio.get_event_loop()
         self.address = address
+        self.ble_device = ble_device
         self._reset_client()
         self._print_exception_details = print_exception_details
         self._idle_time_started = None
@@ -61,15 +62,15 @@ class BleSmartLeaf:
 
     def _reset_client(self):
         self._log('Reset client...')
-        self.client = BleakClient(self.address)
+        self.client = BleakClient(self.ble_device)
 
-    def connect(self, retries=50):
+    def connect(self, retries=3):
         try:
             return self.loop.create_task(asyncio.wait_for(self._connect(retries), timeout=140))
         except Exception as e:
             self._log('Exception occurred while tryinc to connect', e)
 
-    async def _connect(self, retries=50):
+    async def _connect(self, retries=3):
         if self.client.is_connected:
             return True
 
