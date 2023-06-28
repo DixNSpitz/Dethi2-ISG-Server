@@ -13,7 +13,7 @@ import asyncio
 loop_running = False
 
 
-@scheduler.task('cron', id='ble_heartbeat', minute='*/2')
+# @scheduler.task('cron', id='ble_heartbeat', minute='*/2')
 def ble_heartbeat():
     global loop_running
     asyncio.set_event_loop(smd.loop)
@@ -99,7 +99,7 @@ async def simple_connect(macs):
     for sl in smd.ble_smart_leafs: sl.connect()
 
 
-@scheduler.task('cron', id='fetch_smart_leaf_report', minute='*/10')
+# @scheduler.task('cron', id='fetch_smart_leaf_report', minute='*/10')
 def fetch_smart_leaf_report_cron():
     print('Starting cron job "fetch_smart_leaf_report"')
     if smd.ble_smart_leafs is None or len(smd.ble_smart_leafs) == 0:

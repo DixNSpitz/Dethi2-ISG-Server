@@ -17,23 +17,23 @@ class _GameState:
             if not sl.client.is_connected:
                 not_connected = True
 
-        if not_connected:
-            print('One or more Smart-Leafs are not conencted. Cannot start game!')
-            return
+        #if not_connected:
+        #    print('One or more Smart-Leafs are not conencted. Cannot start game!')
+        #    return
 
-        rand_question_idx = randrange(1, 17)
-        correct_plant_id = choose_question(rand_question_idx)
-        if correct_plant_id < 0:
-            return
+        #rand_question_idx = randrange(1, 17)
+        #correct_plant_id = choose_question(rand_question_idx)
+        #if correct_plant_id < 0:
+        #    return
 
-        def game_one_callback(client, value):
-            chosen_plant_id = callback_touch(client, value)
-            user_chose_plant(chosen_plant_id, correct_plant_id)
-            self.stop_game()
+        #def game_one_callback(client, value):
+        #    chosen_plant_id = callback_touch(client, value)
+        #    user_chose_plant(chosen_plant_id, correct_plant_id)
+        #    self.stop_game()
 
-        for sl in ble_smart_leafs:
-            sl.custom_callback_touch = game_one_callback
-            sl.use_custom_callbacks = True
+        #for sl in ble_smart_leafs:
+        #    sl.custom_callback_touch = game_one_callback
+        #    sl.use_custom_callbacks = True
 
         if self.state == 'on':
             print(f"Stopping {self.game}")
